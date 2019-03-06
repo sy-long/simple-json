@@ -20,8 +20,8 @@ public:
 	string sim_get_parse_value();
 private:
 	void sim_parse_whitespace(char **);
-	int sim_classify_parse__value(const char *);
-	int sim_parse_literal(const char *, string, simple_json::sim_type);
+	int sim_classify_parse__value(char **);
+	int sim_parse_literal(char **, string, simple_json::sim_type);
 	void sim_set_parse_type(sim_type);
 	void sim_set_parse_boolean_valuse(string &);
 	void sim_clear();
