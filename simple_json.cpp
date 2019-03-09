@@ -7,10 +7,15 @@ simple_json::simple_json(){
 	sim_value.boolean_value = "false";
 	sim_value.number_value = 0.0;
 	sim_value.string_value = "";
+	sim_value.array_e.clear();
 }
 
 void simple_json::sim_clear() {
-	simple_json();
+	sim_value.type = SIM_NULL;
+	sim_value.boolean_value = "false";
+	sim_value.number_value = 0.0;
+	sim_value.string_value = "";
+	sim_value.array_e.clear();
 }
 
 void simple_json::sim_parse_whitespace(char **handle) {
@@ -100,11 +105,56 @@ int simple_json::sim_parse_string(char **handle) {
 	return simple_json::SIM_PARSE_OK;
 }
 
+int simple_json::sim_parse_array(char **handle) {
+	(*handle)++;
+	sim_parse_whitespace(handle);
+	if ((**handle) == ']'){
+		(*handle)++;
+		sim_set_parse_type(simple_json::SIM_ARRAY);
+		return SIM_PARSE_OK;
+	}
+	string t_str;
+	int state = 0;
+	int count = 0;
+	while ((**handle) != '\0' && (**handle) != ']') {
+		for (; (**handle) == ',';) (*handle)++;
+		sim_parse_whitespace(handle);
+		if ((**handle) == '[') state = 1;
+		for (;(**handle != '\0'); (*handle)++) {
+			if (**handle == '[') count++;
+			if (**handle == ',')
+				if (state != 1)
+					break;
+			if (**handle == ']')
+				if (state != 1)
+					break;
+			if (**handle == ']'&&count != 0) count--;
+			if (**handle == ']'&&count == 0) state = 0;
+			t_str.push_back((**handle));
+		}
+		if((**handle)=='\0') return SIM_PARSE_INVALID_VALUE;
+		while (t_str[t_str.size() - 1] == ' ') t_str.pop_back();
+		simple_json s;
+		int ret;
+		if ((ret = s.sim_parse_value(t_str)) != SIM_PARSE_OK)
+			return ret;
+		sim_value.array_e.push_back(s);
+		t_str = "";
+		state = 0;
+		count = 0;
+	}
+	if (**handle != ']') return SIM_PARSE_INVALID_VALUE;
+	(*handle)++;
+	sim_set_parse_type(simple_json::SIM_ARRAY);
+	return SIM_PARSE_OK;
+}
+
 int simple_json::sim_classify_parse__value(char **handle) {
 	switch (**handle) {
 		case 'n':return sim_parse_literal(handle, "null", simple_json::SIM_NULL);
 		case 't':return sim_parse_literal(handle, "true", simple_json::SIM_BOOLEAN);
 		case 'f':return sim_parse_literal(handle, "false", simple_json::SIM_BOOLEAN);
+		case '[':return sim_parse_array(handle);
 		case '\"':return sim_parse_string(handle);
 		default:return sim_parse_number(handle);
 	}
@@ -143,4 +193,14 @@ string simple_json::sim_get_parse_string_value() {
 	if ((*this).sim_value.type == simple_json::SIM_STRING)
 		return (*this).sim_value.string_value;
 	else return "";
+}
+int simple_json::sim_get_parse_array_size() {
+	if ((*this).sim_value.type == simple_json::SIM_ARRAY)
+		return (*this).sim_value.array_e.size();
+	else return 0;
+}
+simple_json* simple_json::sim_get_parse_array_e(int index) {
+	if ((*this).sim_value.type == simple_json::SIM_ARRAY&&index< (*this).sim_value.array_e.size())
+		return &(*this).sim_value.array_e[index];
+	else return NULL;
 }
