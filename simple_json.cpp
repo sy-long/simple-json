@@ -6,6 +6,7 @@ simple_json::simple_json(){
 	sim_value.type = SIM_NULL;
 	sim_value.boolean_value = "false";
 	sim_value.number_value = 0.0;
+	sim_value.string_value = "";
 }
 
 void simple_json::sim_clear() {
@@ -67,11 +68,44 @@ int simple_json::sim_parse_number(char **handle) {
 	return simple_json::SIM_PARSE_OK;
 }
 
+int simple_json::sim_parse_string(char **handle) {
+	(*handle)++;
+	string t_str = "";
+	while ((**handle) != '\0') {
+		if ((**handle) != '\\') t_str += (**handle);
+		else {
+			switch (*(++(*handle)))
+			{
+			case '\"':t_str += '\"'; break;
+			case '\\':t_str += '\\'; break;
+			case '/':t_str += '/'; break;
+			case 'b':t_str += '\b'; break;
+			case 'f':t_str += '\f'; break;
+			case 'n':t_str += '\n'; break;
+			case 'r':t_str += '\r'; break;
+			case 't':t_str += '\t'; break;
+			default:
+				return SIM_PARSE_INVALID_VALUE;
+				break;
+			}
+		}
+		if((**handle)<0x20) return SIM_PARSE_INVALID_VALUE;
+		(*handle)++;
+	}
+	size_t len = t_str.size() - 1;
+	if(t_str[len]!='\"') return SIM_PARSE_INVALID_VALUE;
+	t_str.pop_back();
+	(*this).sim_value.type = simple_json::SIM_STRING;
+	(*this).sim_value.string_value = t_str;
+	return simple_json::SIM_PARSE_OK;
+}
+
 int simple_json::sim_classify_parse__value(char **handle) {
 	switch (**handle) {
 		case 'n':return sim_parse_literal(handle, "null", simple_json::SIM_NULL);
 		case 't':return sim_parse_literal(handle, "true", simple_json::SIM_BOOLEAN);
 		case 'f':return sim_parse_literal(handle, "false", simple_json::SIM_BOOLEAN);
+		case '\"':return sim_parse_string(handle);
 		default:return sim_parse_number(handle);
 	}
 }
@@ -98,8 +132,15 @@ simple_json::sim_type simple_json::sim_get_parse_type() {
 string simple_json::sim_get_parse_boolean_value() {
 	if((*this).sim_value.type==simple_json::SIM_BOOLEAN)
 		return (*this).sim_value.boolean_value;
+	else return "false";
 }
 double simple_json::sim_get_parse_number_value() {
 	if ((*this).sim_value.type == simple_json::SIM_NUMBER)
 		return (*this).sim_value.number_value;
+	else return 0.0;
+}
+string simple_json::sim_get_parse_string_value() {
+	if ((*this).sim_value.type == simple_json::SIM_STRING)
+		return (*this).sim_value.string_value;
+	else return "";
 }

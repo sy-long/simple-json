@@ -63,6 +63,9 @@ static void test_parse_invalid_value() {
 
 	expect_actual(simple_json::SIM_PARSE_INVALID_VALUE, s.sim_parse_value("0x123"));
 	expect_actual(simple_json::SIM_NULL, s.sim_get_parse_type());
+
+	expect_actual(simple_json::SIM_PARSE_INVALID_VALUE, s.sim_parse_value("\"\\v\""));
+	expect_actual(simple_json::SIM_NULL, s.sim_get_parse_type());
 }
 static void test_parse_root_not_singular() {
 
@@ -112,6 +115,27 @@ void test_parse_number() {
 }
 
 
+
+static void test_parse_string() {
+	simple_json s;
+	expect_actual(simple_json::SIM_PARSE_OK, s.sim_parse_value("\"\""));
+	expect_actual(simple_json::SIM_STRING, s.sim_get_parse_type());
+	expect_actual("", s.sim_get_parse_string_value());
+
+	expect_actual(simple_json::SIM_PARSE_OK, s.sim_parse_value("\"Hello\""));
+	expect_actual(simple_json::SIM_STRING, s.sim_get_parse_type());
+	expect_actual("Hello", s.sim_get_parse_string_value());
+
+	expect_actual(simple_json::SIM_PARSE_OK, s.sim_parse_value("\"Hello\\nWorld\""));
+	expect_actual(simple_json::SIM_STRING, s.sim_get_parse_type());
+	expect_actual("Hello\nWorld", s.sim_get_parse_string_value());
+
+	expect_actual(simple_json::SIM_PARSE_OK, s.sim_parse_value("\"\\\" \\\\ \\/ \\b \\f \\n \\r \\t\""));
+	expect_actual(simple_json::SIM_STRING, s.sim_get_parse_type());
+	expect_actual("\" \\ / \b \f \n \r \t", s.sim_get_parse_string_value());
+
+}
+
 void test_parse(){
 	test_parse_null();
 	test_parse_boolean();
@@ -119,6 +143,7 @@ void test_parse(){
 	test_parse_invalid_value();
 	test_parse_root_not_singular();
 	test_parse_number();
+	test_parse_string();
 }
 
 int main(){

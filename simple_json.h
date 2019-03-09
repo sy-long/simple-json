@@ -12,6 +12,7 @@ private:
 	{
 		double number_value;
 		string boolean_value;
+		string string_value;
 		sim_type type;
 	}sim_value;
 public:
@@ -20,6 +21,7 @@ public:
 	sim_type sim_get_parse_type();
 	string sim_get_parse_boolean_value();
 	double sim_get_parse_number_value();
+	string sim_get_parse_string_value();
 private:
 	void sim_parse_whitespace(char **);
 	int sim_classify_parse__value(char **);
@@ -28,6 +30,7 @@ private:
 	void sim_set_parse_type(sim_type);
 	void sim_set_parse_boolean_valuse(string &);
 	void sim_set_parse_number_value(double);
+	int sim_parse_string(char **);
 	void sim_clear();
 };
 
