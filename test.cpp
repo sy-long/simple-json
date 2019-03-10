@@ -233,8 +233,73 @@ void test_parse(){
 	test_parse_object();
 }
 
+void test_stringify_null() {
+	simple_json s;
+	s.sim_parse_value("null");
+	simple_json_stringify s_j_s;
+	expect_actual(simple_json_stringify::SIM_STRINGIFY_OK, s_j_s.sim_stringify_value(s));
+	expect_actual("null", s_j_s.sim_get_stringify_value());
+}
+
+void test_stringify_boolean() {
+	simple_json s;
+	simple_json_stringify s_j_s;
+
+	s.sim_parse_value("true");
+	expect_actual(simple_json_stringify::SIM_STRINGIFY_OK, s_j_s.sim_stringify_value(s));
+	expect_actual("true", s_j_s.sim_get_stringify_value());
+
+	s.sim_parse_value("false");
+	expect_actual(simple_json_stringify::SIM_STRINGIFY_OK, s_j_s.sim_stringify_value(s));
+	expect_actual("false", s_j_s.sim_get_stringify_value());
+}
+
+void test_stringify_number() {
+	simple_json s;
+	simple_json_stringify s_j_s;
+
+	s.sim_parse_value("123");
+	expect_actual(simple_json_stringify::SIM_STRINGIFY_OK, s_j_s.sim_stringify_value(s));
+	expect_actual("123", s_j_s.sim_get_stringify_value());
+
+	s.sim_parse_value("123.0000000000001");
+	expect_actual(simple_json_stringify::SIM_STRINGIFY_OK, s_j_s.sim_stringify_value(s));
+	expect_actual("123.0000000000001", s_j_s.sim_get_stringify_value());
+}
+
+void test_stringify_string() {
+	simple_json s;
+	simple_json_stringify s_j_s;
+
+	s.sim_parse_value("\"Hello\\nWorld\"");
+	expect_actual(simple_json_stringify::SIM_STRINGIFY_OK, s_j_s.sim_stringify_value(s));
+	expect_actual("\"Hello\\nWorld\"", s_j_s.sim_get_stringify_value());
+
+	s.sim_parse_value("\"\\\" \\\\ \\/ \\b \\f \\n \\r \\t\"");
+	expect_actual(simple_json_stringify::SIM_STRINGIFY_OK, s_j_s.sim_stringify_value(s));
+	expect_actual("\"\\\" \\\\ \\/ \\b \\f \\n \\r \\t\"", s_j_s.sim_get_stringify_value());
+}
+
+void test_stringify_array() {
+	simple_json s;
+	simple_json_stringify s_j_s;
+
+	s.sim_parse_value("[123,[123,456],\"test\"]");
+	expect_actual(simple_json_stringify::SIM_STRINGIFY_OK, s_j_s.sim_stringify_value(s));
+	expect_actual("[123,[123,456],\"test\"]", s_j_s.sim_get_stringify_value());
+}
+
+void test_stringify() {
+	test_stringify_null();
+	test_stringify_boolean();
+	test_stringify_number();
+	test_stringify_string();
+	test_stringify_array();
+}
+
 int main(){
 	test_parse();
+	test_stringify();
 	cout << pass << '/' << count;
 	cin.get();
 }

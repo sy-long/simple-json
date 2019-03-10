@@ -6,8 +6,7 @@
 using std::map;
 using std::vector;
 using std::string;
-class simple_json
-{
+class simple_json{
 public:
 	static enum sim_type {SIM_NULL,SIM_BOOLEAN,SIM_NUMBER,SIM_STRING,SIM_ARRAY,SIM_OBJECT};
 	static enum inf{ SIM_PARSE_OK, SIM_PARSE_EXPECE_VALUE, SIM_PARSE_INVALID_VALUE, SIM_PARSE_ROOT_NOT_SINGULAR };
@@ -47,5 +46,21 @@ private:
 	int sim_parse_array(char **);
 	int sim_parse_object(char **);
 };
-
+class simple_json_stringify {
+private:
+	string result;
+public:
+	enum { SIM_STRINGIFY_FAIL, SIM_STRINGIFY_OK };
+private:
+	int sim_stringify_null();
+	int sim_stringify_boolean(simple_json &);
+	int sim_stringify_number(simple_json &);
+	int sim_stringify_string(simple_json &);
+	int sim_stringify_array(simple_json &);
+public:
+	simple_json_stringify() { result = ""; }
+	void clear() { result = ""; }
+	int sim_stringify_value(simple_json &);
+	string & sim_get_stringify_value();
+};
 #endif
