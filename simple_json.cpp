@@ -1,6 +1,7 @@
 #include "simple_json.h"
 #include <sstream>
 using std::istringstream;
+using std::pair;
 
 simple_json::simple_json(){
 	sim_value.type = SIM_NULL;
@@ -8,6 +9,7 @@ simple_json::simple_json(){
 	sim_value.number_value = 0.0;
 	sim_value.string_value = "";
 	sim_value.array_e.clear();
+	sim_value.object_e.clear();
 }
 
 void simple_json::sim_clear() {
@@ -16,6 +18,7 @@ void simple_json::sim_clear() {
 	sim_value.number_value = 0.0;
 	sim_value.string_value = "";
 	sim_value.array_e.clear();
+	sim_value.object_e.clear();
 }
 
 void simple_json::sim_parse_whitespace(char **handle) {
@@ -149,6 +152,88 @@ int simple_json::sim_parse_array(char **handle) {
 	return SIM_PARSE_OK;
 }
 
+int simple_json::sim_parse_object(char **handle) {
+	(*handle)++;
+	sim_parse_whitespace(handle);
+	if ((**handle) == '}') {
+		(*handle)++;
+		sim_set_parse_type(simple_json::SIM_OBJECT);
+		return SIM_PARSE_OK;
+	}
+	string t_str_k="";
+	string t_str_v="";
+	simple_json k;
+	simple_json v;
+	int count = 0;
+	int state = 0;
+	int count_arr = 0;
+	int state_arr = 0;
+	map<simple_json, simple_json> t_value;
+	int ret;
+	while ((**handle) != '}'&&(**handle)!='\0') {
+
+		while ((**handle) != ':' && (**handle) != '\0') {
+			t_str_k.push_back(**handle);
+			(*handle)++;
+		}
+		if((**handle)=='\0') return simple_json::SIM_PARSE_INVALID_VALUE;
+		if (t_str_k.size() == 0) return simple_json::SIM_PARSE_INVALID_VALUE;
+		while (t_str_k[t_str_k.size() - 1] == ' ') t_str_k.pop_back();
+		if (t_str_k.size() == 0) return simple_json::SIM_PARSE_INVALID_VALUE;
+		if ((ret = k.sim_parse_value(t_str_k)) != simple_json::SIM_PARSE_OK) return simple_json::SIM_PARSE_INVALID_VALUE;
+		if (k.sim_get_parse_type() != simple_json::SIM_STRING) return simple_json::SIM_PARSE_INVALID_VALUE;
+		(*handle)++;
+
+		sim_parse_whitespace(handle);
+		if ((**handle) == '{')  state = 1;
+		if ((**handle) == '[') 
+			state_arr = 1;
+		while ((**handle) != '\0') {
+
+			if ((**handle) == '{') count++;
+			if ((**handle) == '[') count_arr++;
+
+			if ((**handle) == ',')
+				if (state == 0)
+					if (state_arr == 0)
+						break;
+			if ((**handle) == '}')
+				if (state == 0)
+					if (state_arr == 0)
+						if (state_arr == 0)
+					break;
+
+			if (**handle == '}'&&count != 0) count--;
+			if (**handle == '}'&&count == 0) state = 0;
+
+			if (**handle == ']'&&count_arr != 0) count_arr--;
+			if (**handle == ']'&&count_arr == 0) state_arr = 0;
+
+			t_str_v.push_back(**handle);
+			(*handle)++;
+		}
+		if (t_str_v.size() == 0) return simple_json::SIM_PARSE_INVALID_VALUE;
+		if ((**handle) == '\0') return simple_json::SIM_PARSE_INVALID_VALUE;
+		while (t_str_v[t_str_v.size() - 1] == ' ') t_str_v.pop_back();
+
+		if (t_str_v.size() == 0) return simple_json::SIM_PARSE_INVALID_VALUE;
+
+		if ((ret = v.sim_parse_value(t_str_v)) != simple_json::SIM_PARSE_OK) return simple_json::SIM_PARSE_INVALID_VALUE;
+		t_value.insert(pair<simple_json, simple_json>(k, v));
+		sim_value.object_e.push_back(t_value);
+		if((**handle)==',')(*handle)++;
+		t_str_k = "";
+		t_str_v = "";
+		int count = 0;
+		int state = 0;
+		t_value.clear();
+	}
+	if ((**handle) == '}') (*handle)++;
+	sim_set_parse_type(simple_json::SIM_OBJECT);
+	return SIM_PARSE_OK;
+}
+
+
 int simple_json::sim_classify_parse__value(char **handle) {
 	switch (**handle) {
 		case 'n':return sim_parse_literal(handle, "null", simple_json::SIM_NULL);
@@ -156,6 +241,7 @@ int simple_json::sim_classify_parse__value(char **handle) {
 		case 'f':return sim_parse_literal(handle, "false", simple_json::SIM_BOOLEAN);
 		case '[':return sim_parse_array(handle);
 		case '\"':return sim_parse_string(handle);
+		case '{':return sim_parse_object(handle);
 		default:return sim_parse_number(handle);
 	}
 }
@@ -203,4 +289,14 @@ simple_json* simple_json::sim_get_parse_array_e(int index) {
 	if ((*this).sim_value.type == simple_json::SIM_ARRAY&&index< (*this).sim_value.array_e.size())
 		return &(*this).sim_value.array_e[index];
 	else return NULL;
+}
+int simple_json::sim_get_parse_object_size() {
+	if ((*this).sim_value.type == simple_json::SIM_OBJECT)
+		return (*this).sim_value.object_e.size();
+	else return 0;
+}
+map<simple_json, simple_json> simple_json::sim_get_parse_object_e(int index) {
+	if ((*this).sim_value.type == simple_json::SIM_OBJECT&&index < (*this).sim_value.object_e.size()) {
+		return (*this).sim_value.object_e[index];
+	}
 }

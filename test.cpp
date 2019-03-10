@@ -78,6 +78,25 @@ static void test_parse_invalid_value() {
 
 	expect_actual(simple_json::SIM_PARSE_INVALID_VALUE, s.sim_parse_value("[1 2"));
 	expect_actual(simple_json::SIM_NULL, s.sim_get_parse_type());
+
+	expect_actual(simple_json::SIM_PARSE_INVALID_VALUE, s.sim_parse_value("{:1,"));
+	expect_actual(simple_json::SIM_NULL, s.sim_get_parse_type());
+
+	expect_actual(simple_json::SIM_PARSE_INVALID_VALUE, s.sim_parse_value("{1:1,"));
+	expect_actual(simple_json::SIM_NULL, s.sim_get_parse_type());
+
+	expect_actual(simple_json::SIM_PARSE_INVALID_VALUE, s.sim_parse_value("{1:1,"));
+	expect_actual(simple_json::SIM_NULL, s.sim_get_parse_type());
+
+	expect_actual(simple_json::SIM_PARSE_INVALID_VALUE, s.sim_parse_value("{false:1,"));
+	expect_actual(simple_json::SIM_NULL, s.sim_get_parse_type());
+
+	expect_actual(simple_json::SIM_PARSE_INVALID_VALUE, s.sim_parse_value(
+		"\"n\" : null , "
+		"\"f\" : , "
+		"\"t\" : true , "
+	));
+	expect_actual(simple_json::SIM_NULL, s.sim_get_parse_type());
 }
 static void test_parse_root_not_singular() {
 
@@ -182,6 +201,26 @@ void test_parse_array() {
 
 }
 
+void test_parse_object(){
+	simple_json s;
+	expect_actual(simple_json::SIM_PARSE_OK, s.sim_parse_value(
+		" { "
+		"\"n\" : null , "
+		"\"f\" : false , "
+		"\"t\" : true , "
+		"\"i\" : 123 , "
+		"\"s\" : \"abc\" , "
+		"\"a\" : [ 1, 2, 3 ],"
+		"\"o\" : { \"1\" : 1, \"2\" : 2, \"3\" : 3 }"
+		" } "
+	));
+	expect_actual(simple_json::SIM_OBJECT, s.sim_get_parse_type());
+	expect_actual(7, s.sim_get_parse_object_size());
+	simple_json t;
+	t.sim_parse_value("\"i\"");
+	expect_actual(123, s.sim_get_parse_object_e(3)[t].sim_get_parse_number_value());
+}
+
 void test_parse(){
 	test_parse_null();
 	test_parse_boolean();
@@ -191,6 +230,7 @@ void test_parse(){
 	test_parse_number();
 	test_parse_array();
 	test_parse_string();
+	test_parse_object();
 }
 
 int main(){

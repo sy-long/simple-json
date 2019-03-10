@@ -2,6 +2,8 @@
 #define SIMPLE_JSON_H__
 #include<string>
 #include <vector>
+#include <map>
+using std::map;
 using std::vector;
 using std::string;
 class simple_json
@@ -12,6 +14,7 @@ public:
 private:
 	struct value
 	{
+		vector<map<simple_json, simple_json>> object_e;
 		vector<simple_json> array_e;
 		double number_value;
 		string boolean_value;
@@ -28,6 +31,9 @@ public:
 	string sim_get_parse_string_value();
 	int sim_get_parse_array_size();
 	simple_json* sim_get_parse_array_e(int index);
+	bool operator<(const simple_json &p) const{return false;}
+	int sim_get_parse_object_size();
+	map<simple_json, simple_json> sim_get_parse_object_e(int);
 private:
 	void sim_parse_whitespace(char **);
 	int sim_classify_parse__value(char **);
@@ -39,6 +45,7 @@ private:
 	int sim_parse_string(char **);
 	void sim_clear();
 	int sim_parse_array(char **);
+	int sim_parse_object(char **);
 };
 
 #endif
