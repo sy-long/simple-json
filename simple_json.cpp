@@ -1,7 +1,6 @@
 #include "simple_json.h"
 #include <sstream>
 using std::istringstream;
-using std::pair;
 
 simple_json::simple_json(){
 	sim_value.type = SIM_NULL;
@@ -295,8 +294,7 @@ int simple_json::sim_get_parse_object_size() {
 		return (*this).sim_value.object_e.size();
 	else return 0;
 }
-map<simple_json, simple_json> simple_json::sim_get_parse_object_e(int index) {
-	if ((*this).sim_value.type == simple_json::SIM_OBJECT&&index < (*this).sim_value.object_e.size()) {
-		return (*this).sim_value.object_e[index];
-	}
+pair<simple_json, simple_json> simple_json::sim_get_parse_object_e(int index) {
+	map<simple_json, simple_json>::iterator iter = (*this).sim_value.object_e[index].begin();
+	return *iter;
 }

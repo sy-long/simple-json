@@ -63,6 +63,30 @@ int simple_json_stringify::sim_stringify_array(simple_json &json) {
 	return SIM_STRINGIFY_OK;
 }
 
+
+
+
+int simple_json_stringify::sim_stringify_object(simple_json &json) {
+	string value = "";
+	value += '{';
+	simple_json t;
+	simple_json_stringify s_j_s;
+	for (size_t i = 0; i < json.sim_get_parse_object_size(); i++) {
+		t = json.sim_get_parse_object_e(i).first;
+		s_j_s.sim_stringify_value(t);
+		value += s_j_s.sim_get_stringify_value();
+		value += ':';
+		t = json.sim_get_parse_object_e(i).second;
+		s_j_s.sim_stringify_value(t);
+		value += s_j_s.sim_get_stringify_value();
+		if (i != json.sim_get_parse_object_size() - 1) {
+			value += ',';
+		}
+	}
+	value += '}';
+	(*this).result = value;
+	return SIM_STRINGIFY_OK;
+}
 int simple_json_stringify::sim_stringify_value(simple_json &json) {
 	(*this).clear();
 	switch (json.sim_get_parse_type())
@@ -72,7 +96,7 @@ int simple_json_stringify::sim_stringify_value(simple_json &json) {
 		case simple_json::SIM_NUMBER:return sim_stringify_number(json);
 		case simple_json::SIM_STRING:return sim_stringify_string(json);
 		case simple_json::SIM_ARRAY:return sim_stringify_array(json);
-		case simple_json::SIM_OBJECT:
+		case simple_json::SIM_OBJECT:return sim_stringify_object(json);
 	default:
 		break;
 	}

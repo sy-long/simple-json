@@ -216,9 +216,9 @@ void test_parse_object(){
 	));
 	expect_actual(simple_json::SIM_OBJECT, s.sim_get_parse_type());
 	expect_actual(7, s.sim_get_parse_object_size());
-	simple_json t;
-	t.sim_parse_value("\"i\"");
-	expect_actual(123, s.sim_get_parse_object_e(3)[t].sim_get_parse_number_value());
+	simple_json t = s.sim_get_parse_object_e(3).second;
+	expect_actual(123, s.sim_get_parse_object_e(3).second.sim_get_parse_number_value());
+	
 }
 
 void test_parse(){
@@ -289,12 +289,42 @@ void test_stringify_array() {
 	expect_actual("[123,[123,456],\"test\"]", s_j_s.sim_get_stringify_value());
 }
 
+void test_stringify_object() {
+	simple_json s;
+	simple_json_stringify s_j_s;
+
+	s.sim_parse_value(
+		" { "
+		"\"n\" : null , "
+		"\"f\" : false , "
+		"\"t\" : true , "
+		"\"i\" : 123 , "
+		"\"s\" : \"abc\" , "
+		"\"a\" : [ 1, 2, 3 ],"
+		"\"o\" : { \"1\" : 1, \"2\" : 2, \"3\" : 3 }"
+		" } "
+	);
+	expect_actual(simple_json_stringify::SIM_STRINGIFY_OK, s_j_s.sim_stringify_value(s));
+	expect_actual(
+		"{"
+		"\"n\":null,"
+		"\"f\":false,"
+		"\"t\":true,"
+		"\"i\":123,"
+		"\"s\":\"abc\","
+		"\"a\":[1,2,3],"
+		"\"o\":{\"1\":1,\"2\":2,\"3\":3}"
+		"}"
+		, s_j_s.sim_get_stringify_value());
+}
+
 void test_stringify() {
 	test_stringify_null();
 	test_stringify_boolean();
 	test_stringify_number();
 	test_stringify_string();
 	test_stringify_array();
+	test_stringify_object();
 }
 
 int main(){

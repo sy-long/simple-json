@@ -6,6 +6,7 @@
 using std::map;
 using std::vector;
 using std::string;
+using std::pair;
 class simple_json{
 public:
 	static enum sim_type {SIM_NULL,SIM_BOOLEAN,SIM_NUMBER,SIM_STRING,SIM_ARRAY,SIM_OBJECT};
@@ -32,7 +33,7 @@ public:
 	simple_json* sim_get_parse_array_e(int index);
 	bool operator<(const simple_json &p) const{return false;}
 	int sim_get_parse_object_size();
-	map<simple_json, simple_json> sim_get_parse_object_e(int);
+	pair<simple_json,simple_json> sim_get_parse_object_e(int);
 private:
 	void sim_parse_whitespace(char **);
 	int sim_classify_parse__value(char **);
@@ -57,6 +58,7 @@ private:
 	int sim_stringify_number(simple_json &);
 	int sim_stringify_string(simple_json &);
 	int sim_stringify_array(simple_json &);
+	int sim_stringify_object(simple_json &);
 public:
 	simple_json_stringify() { result = ""; }
 	void clear() { result = ""; }
