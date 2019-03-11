@@ -48,9 +48,19 @@ int simple_json_stringify::sim_stringify_string(simple_json &json) {
 }
 
 int simple_json_stringify::sim_stringify_array(simple_json &json) {
-	for (size_t i; i < json.sim_get_parse_array_size; i++) {
-
+	string value = "";
+	value += '[';
+	simple_json_stringify s_j_s;
+	for (size_t i = 0; i < json.sim_get_parse_array_size(); i++) {
+		s_j_s.sim_stringify_value(*(json.sim_get_parse_array_e(i)));
+		value += s_j_s.sim_get_stringify_value();
+		if (i != json.sim_get_parse_array_size() - 1) {
+			value += ',';
+		}
 	}
+	value += ']';
+	(*this).result = value;
+	return SIM_STRINGIFY_OK;
 }
 
 int simple_json_stringify::sim_stringify_value(simple_json &json) {
