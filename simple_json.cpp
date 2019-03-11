@@ -3,12 +3,7 @@
 using std::istringstream;
 
 simple_json::simple_json(){
-	sim_value.type = SIM_NULL;
-	sim_value.boolean_value = "false";
-	sim_value.number_value = 0.0;
-	sim_value.string_value = "";
-	sim_value.array_e.clear();
-	sim_value.object_e.clear();
+	sim_clear();
 }
 
 void simple_json::sim_clear() {
