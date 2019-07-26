@@ -20,3 +20,7 @@
 * 解析器/生成器类声明（simple_json.h）
 * 解析器实现文件（simple_json.cpp）
 * 生成器实现文件 （simple_json_stringify.cpp）
+
+应用说明：
+* 包含文件后你需要创建一个simple_json类对象，调用sim_parse_value("JSON")接口方法去传入你需要解析的JSON数据
+* 调用你上一步创建的simple_json类对象的相应方法去获取解析得到的值
