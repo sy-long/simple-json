@@ -130,7 +130,7 @@ int simple_json::sim_parse_array(char **handle) {
 			t_str.push_back((**handle));
 		}
 		if((**handle)=='\0') return SIM_PARSE_INVALID_VALUE;
-		while (t_str[t_str.size() - 1] == ' ') t_str.pop_back();
+		while (t_str[t_str.size() - 1] == ' '|| t_str[t_str.size() - 1] == '\n') t_str.pop_back();
 		simple_json s;
 		int ret;
 		if ((ret = s.sim_parse_value(t_str)) != SIM_PARSE_OK)
@@ -158,8 +158,8 @@ int simple_json::sim_parse_object(char **handle) {
 	string t_str_v="";
 	simple_json k;
 	simple_json v;
-	int count = 0;
 	int state = 0;
+	int count = 0;
 	int count_arr = 0;
 	int state_arr = 0;
 	map<simple_json, simple_json> t_value;
@@ -179,7 +179,8 @@ int simple_json::sim_parse_object(char **handle) {
 		(*handle)++;
 
 		sim_parse_whitespace(handle);
-		if ((**handle) == '{')  state = 1;
+		if ((**handle) == '{') 
+			state = 1;
 		if ((**handle) == '[') 
 			state_arr = 1;
 		while ((**handle) != '\0') {
@@ -208,7 +209,7 @@ int simple_json::sim_parse_object(char **handle) {
 		}
 		if (t_str_v.size() == 0) return simple_json::SIM_PARSE_INVALID_VALUE;
 		if ((**handle) == '\0') return simple_json::SIM_PARSE_INVALID_VALUE;
-		while (t_str_v[t_str_v.size() - 1] == ' ') t_str_v.pop_back();
+		while (t_str_v[t_str_v.size() - 1] == ' '|| t_str_v[t_str_v.size() - 1] == '\n') t_str_v.pop_back();
 
 		if (t_str_v.size() == 0) return simple_json::SIM_PARSE_INVALID_VALUE;
 
@@ -218,8 +219,8 @@ int simple_json::sim_parse_object(char **handle) {
 		if((**handle)==',')(*handle)++;
 		t_str_k = "";
 		t_str_v = "";
-		int count = 0;
-		int state = 0;
+		count = 0;
+		state = 0;
 		t_value.clear();
 	}
 	if ((**handle) == '}') (*handle)++;
